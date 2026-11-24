@@ -127,3 +127,16 @@ pre { margin: 0; font-size: 10.5px; line-height: 1.6; background: #1F1F24; color
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
 
 @media print { body * { display: none !important; } body::after { content: "چاپ این کتاب مجاز نیست"; display: block; font: 700 20px HK, sans-serif; text-align: center; padding: 40px; } }
+
+/* ---------- hold to read (touch web) ---------- */
+.hold #pages, .hold #tm-body { filter: blur(20px) saturate(.6); transition: filter .12s ease-out; }
+.hold.touching #pages, .hold.touching #tm-body { filter: none; transition-duration: .06s; }
+#veil { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(300px, calc(100vw - 48px)); z-index: 26;
+  display: none; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 20px 18px; border-radius: 20px;
+  background: rgba(28, 25, 23, .92); color: #fff; pointer-events: none; transition: opacity .12s ease-out; }
+#veil svg { width: 34px; height: 34px; fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#veil b { font-size: 15px; }
+#veil span { font-size: 12.5px; color: #D6D3D1; line-height: 1.8; }
+.hold.ready #veil { display: flex; }
+.hold.touching #veil { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .hold #pages, .hold #tm-body, #veil { transition: none; } }

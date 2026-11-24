@@ -26,7 +26,9 @@
     <script>
       // Register the service worker where allowed (it is refused inside sandboxed previews).
       try { if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {}
+      // Android/desktop Chrome: keep the install prompt for the in-app "نصب" button (the event fires before React mounts).
+      window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.__hkInstall = e; window.dispatchEvent(new Event('hk-install-ready')); });
     </script>
-  <script src="./static/static/js/web/index-04e3aeac2d91bd14d0472893f61100fc.js" defer></script>
+  <script src="./static/static/js/web/index-d5927e3f3130846d4e7ec666f42184ed.js" defer></script>
 </body>
 </html>

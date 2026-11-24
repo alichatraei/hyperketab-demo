@@ -126,6 +126,7 @@ async function open() {
   state.count = SAMPLE ? Math.min(SAMPLE_PAGES, state.pdf.numPages) : state.pdf.numPages;
   $('loading').remove();
   await buildPages();
+  document.body.classList.add('ready');
   goTo(Math.min(START_PAGE, state.count));
   updateCurrent();
   post({ type: 'hk-reader-ready', pages: state.count });
@@ -536,7 +537,29 @@ $('try-open').onclick = async () => {
   }
 };
 
-open().catch((e) => {
+/* ---------------- hold to read (touch browsers / home-screen web app) ---------------- */
+// Browsers give web pages no way to block or detect screenshots (iOS Safari least of all). On touch devices
+// the pages therefore stay veiled unless a finger rests on the screen: the usual screenshot and recording
+// gestures need the hands elsewhere, so they capture only the veil. The native apps use real OS protection
+// instead (FLAG_SECURE / secure layer), so this is off there.
+const HOLD = !NATIVE && !!window.matchMedia && matchMedia('(pointer: coarse)').matches;
+if (HOLD) {
+  document.body.classList.add('hold');
+  const veil = document.createElement('div');
+  veil.id = 'veil';
+  veil.setAttribute('role', 'note');
+  veil.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 11.5V5.8a1.6 1.6 0 0 1 3.2 0v5.2m0-1.4a1.6 1.6 0 0 1 3.2 0v1.6m0-.4a1.6 1.6 0 0 1 3.2 0v4.4a6 6 0 0 1-6 6h-.8a6 6 0 0 1-4.9-2.5l-2.6-3.7a1.6 1.6 0 0 1 2.5-2l1.4 1.6"/></svg><b>برای خواندن، انگشتتان را روی صفحه نگه دارید</b><span>متن کتاب فقط هنگام لمس نمایش داده می‌شود؛ این کار از کپی با اسکرین‌شات جلوگیری می‌کند.</span>';
+  document.body.appendChild(veil);
+  const sync = (e) => document.body.classList.toggle('touching', e.touches.length > 0);
+  for (const ev of ['touchstart', 'touchend', 'touchcancel']) document.addEventListener(ev, sync, { passive: true });
+  window.addEventListener('blur', () => document.body.classList.remove('touching'));
+}
+
+if (!hasHost()) {
+  // Opened directly (not inside the app): never load the licence or the book.
+  const l = $('loading');
+  if (l) l.innerHTML = '<b>این صفحه فقط داخل اپ هایپر کتاب باز می‌شود</b><span class="small">هایپر کتاب را از صفحه اصلی گوشی باز کنید و کتاب را از کتابخانه انتخاب کنید.</span>';
+} else open().catch((e) => {
   post({ type: 'hk-reader-error', message: e && e.message ? e.message : String(e) });
   const l = $('loading');
   if (l) {
