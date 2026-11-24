@@ -46,9 +46,19 @@ function xhrJson(url, what) {
     x.send();
   });
 }
+// Retries network failures (not HTTP errors) twice — first visits on a slow mobile connection,
+// or while the service worker is still installing, can drop a request.
+async function fetchRetry(url, tries = 3) {
+  for (let i = 0; ; i++) {
+    try { return await fetch(url, { cache: 'no-store' }); } catch {
+      if (i >= tries - 1) throw new Error('اتصال برقرار نشد. اینترنت را بررسی کنید و دوباره تلاش کنید.');
+      await new Promise((r) => setTimeout(r, 600 * (i + 1)));
+    }
+  }
+}
 async function getJson(url, what) {
   if (location.protocol === 'file:') return xhrJson(url, what);
-  const r = await fetch(url, { cache: 'no-store' });
+  const r = await fetchRetry(url);
   if (!r.ok) throw new Error(r.status === 404 ? `${what} این کتاب پیدا نشد.` : `دریافت ${what} ممکن نشد (HTTP ${r.status}).`);
   return r.json();
 }
@@ -529,6 +539,9 @@ $('try-open').onclick = async () => {
 open().catch((e) => {
   post({ type: 'hk-reader-error', message: e && e.message ? e.message : String(e) });
   const l = $('loading');
-  if (l) l.innerHTML = `<b>باز کردن کتاب ممکن نشد</b><span class="small">${escapeHtml(e.message || String(e))}</span>`;
+  if (l) {
+    l.innerHTML = `<b>باز کردن کتاب ممکن نشد</b><span class="small">${escapeHtml(e.message || String(e))}</span><button class="outline" id="retry">تلاش دوباره</button>`;
+    $('retry').onclick = () => location.reload();
+  }
   console.error(e);
 });
