@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <title>هایپر کتاب</title>
+    <meta name="theme-color" content="#C02E2C" />
+    <meta name="description" content="کتاب الکترونیک، صوتی و چاپی — بخوان، بشنو، ورق بزن" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="هایپر کتاب" />
+    <style id="expo-reset">
+      html, body { height: 100%; margin: 0; background: #fff; }
+      body { overflow: hidden; }
+      #root { display: flex; height: 100%; flex: 1; }
+      * { -webkit-tap-highlight-color: transparent; }
+    </style>
+  <meta name="theme-color" content="#C02E2C">
+<link rel="icon" href="./favicon.ico"/></head>
+  <body>
+    <noscript>برای استفاده از هایپر کتاب، جاوااسکریپت را فعال کنید.</noscript>
+    <div id="root"></div>
+    <script>
+      // Register the service worker where allowed (it is refused inside sandboxed previews).
+      try { if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {}
+    </script>
+  <script src="./static/static/js/web/index-04e3aeac2d91bd14d0472893f61100fc.js" defer></script>
+</body>
+</html>

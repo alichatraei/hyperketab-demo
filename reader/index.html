@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>کتاب‌خوان امن هایپر کتاب</title>
+<link rel="stylesheet" href="reader.css">
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <button class="back" id="btn-close" aria-label="بازگشت"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><span>کتابخانه</span></button>
+    <h1><span id="book-title">در حال باز کردن…</span><svg class="lock" viewBox="0 0 24 24" aria-label="محافظت‌شده" role="img"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg></h1>
+    <div class="actions">
+      <button id="btn-notes" aria-label="یادداشت‌ها و هایلایت‌ها"><svg viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.8" cy="6.5" r=".6"/><circle cx="4.8" cy="12" r=".6"/><circle cx="4.8" cy="17.5" r=".6"/></svg></button>
+      <button id="btn-sec" aria-label="سیستم ضد سرقت"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8.2-7.5 9.5-4.3-1.3-7.5-5-7.5-9.5V6z"/><path d="M8.8 12l2.2 2.2 4.3-4.4"/></svg></button>
+    </div>
+  </header>
+
+  <div class="pill" id="pill"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8.2-7.5 9.5-4.3-1.3-7.5-5-7.5-9.5V6z"/></svg>نسخه محافظت‌شده · رمزگشایی فقط در حافظه</div>
+  <main id="viewport" aria-label="صفحات کتاب"><div id="pages"></div><div id="loading" class="loading"><span class="spin"></span><span id="loading-text">دریافت فایل رمزنگاری‌شده…</span></div></main>
+
+  <footer class="bar bottom">
+    <div class="pageinfo"><div class="track"><span id="prog"></span></div><span id="page-label">—</span></div>
+    <div class="tools">
+      <button id="z-out" aria-label="کوچک‌نمایی"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M8 11h6"/></svg></button>
+      <span id="z-label" class="zl">۱۰۰٪</span>
+      <button id="z-in" aria-label="بزرگ‌نمایی"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M8 11h6M11 8v6"/></svg></button>
+      <span class="sep"></span>
+      <button id="t-hl" class="tool" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M14.5 4.5l5 5-8.5 8.5H6v-5z"/><path d="M4 21h16"/></svg><span>هایلایت</span></button>
+      <button id="t-text" class="tool"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 10.5h16M4 15h10M4 19.5h7"/></svg><span>حالت متنی</span></button>
+    </div>
+  </footer>
+</div>
+
+<div id="hint" class="hint" hidden>حالت هایلایت: روی متن انگشت بکشید</div>
+
+<!-- highlight popover -->
+<div id="hl-menu" class="pop" role="menu" hidden>
+  <div class="row"><span class="lbl">رنگ</span><span class="grow"></span>
+    <button class="sw" data-c="#FCE38A" style="background:#FCE38A" aria-label="زرد"></button>
+    <button class="sw" data-c="#BFE8C6" style="background:#BFE8C6" aria-label="سبز"></button>
+    <button class="sw" data-c="#C9DCFA" style="background:#C9DCFA" aria-label="آبی"></button>
+    <button class="sw" data-c="#F8CADB" style="background:#F8CADB" aria-label="صورتی"></button>
+  </div>
+  <div class="row acts">
+    <button id="m-note"><svg viewBox="0 0 24 24"><path d="M4.5 5h15v10.5H9L4.5 19.5z"/></svg>یادداشت</button>
+    <button id="m-del" hidden><svg viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></svg>حذف</button>
+    <button id="m-copy" aria-disabled="true" class="dis"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>کپی</button>
+    <button id="m-cancel"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>بستن</button>
+  </div>
+  <div class="small">کپی و اشتراک متن برای این کتاب غیرفعال است</div>
+</div>
+
+<!-- note sheet -->
+<div id="note-sheet" class="sheet" role="dialog" aria-label="یادداشت" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><button id="n-cancel" class="link">انصراف</button><h2>یادداشت</h2><button id="n-save" class="link strong">ذخیره</button></div>
+  <blockquote id="n-quote"></blockquote>
+  <label for="n-text">یادداشت شما</label>
+  <textarea id="n-text" rows="4" placeholder="برداشت خودتان را بنویسید…"></textarea>
+</div>
+
+<!-- notes list -->
+<div id="notes-panel" class="sheet tall" role="dialog" aria-label="یادداشت‌ها و هایلایت‌ها" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><span></span><h2>یادداشت‌ها و هایلایت‌ها</h2><button class="link close-sheet">بستن</button></div>
+  <div id="notes-list"></div>
+  <p class="small sync">در نسخه واقعی، یادداشت‌ها از طریق API با حساب کاربر در همه دستگاه‌ها همگام می‌شوند. اینجا فقط در همین مرورگر ذخیره می‌شوند.</p>
+</div>
+
+<!-- text mode -->
+<div id="text-mode" hidden>
+  <div class="bar"><button class="back" id="tm-close" aria-label="بازگشت به صفحه‌های کتاب"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg><span>صفحه‌ها</span></button><h1>حالت متنی</h1><span class="actions"></span></div>
+  <article id="tm-body"></article>
+  <div class="tm-controls">
+    <div class="row"><button id="tm-minus" class="big" aria-label="کوچک‌تر کردن متن">A−</button><div class="grow center"><div class="track"><span id="tm-bar"></span></div><span class="small" id="tm-size">اندازه متن</span></div><button id="tm-plus" class="big" aria-label="بزرگ‌تر کردن متن" style="font-size:19px">A+</button></div>
+    <div class="row themes"><span class="lbl">زمینه</span>
+      <button data-t="light" style="background:#fff;color:#1E1E22">روشن</button>
+      <button data-t="sepia" style="background:#F7F1E3;color:#2B2118">کرم</button>
+      <button data-t="gray" style="background:#E4E4E8;color:#1E1E22">طوسی</button>
+      <button data-t="dark" style="background:#141418;color:#D9D6CF">تیره</button>
+    </div>
+    <p class="small">حالت متنی، متن PDF را برای خواندن راحت روی موبایل بازچینی می‌کند. ناشر می‌تواند این حالت را برای هر کتاب خاموش کند.</p>
+  </div>
+</div>
+
+<!-- security panel -->
+<div id="sec-panel" class="sheet tall" role="dialog" aria-label="سیستم ضد سرقت" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><span></span><h2>سیستم ضد سرقت چطور کار می‌کند</h2><button class="link close-sheet">بستن</button></div>
+  <ol id="sec-list" class="sec"></ol>
+  <div class="attack">
+    <h3>اگر کسی فایل را از شبکه بردارد، این را می‌بیند:</h3>
+    <pre id="hex" dir="ltr"></pre>
+    <button id="try-open" class="outline">تلاش برای باز کردن فایل بدون مجوز</button>
+    <div id="try-result" class="small"></div>
+  </div>
+  <div class="limits"><h3>محدودیت‌ها (صادقانه)</h3><ul id="limits"></ul></div>
+</div>
+
+<div id="shield" hidden><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg><b>محتوای کتاب پنهان شد</b><span id="shield-why">برای حفظ حقوق ناشر</span></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="reader.js"></script>
+</body>
+</html>
